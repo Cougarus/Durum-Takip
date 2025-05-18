@@ -1,8 +1,6 @@
 
 from flask import Flask, render_template_string, request, redirect, url_for, session, flash, Response, send_from_directory, jsonify
 from datetime import datetime
-import csv
-from io import StringIO
 import os
 
 app = Flask(__name__)
@@ -49,16 +47,7 @@ def mesaj_gonder():
         mesajlar.append({"gonderen": session['kullanici'], "hedef": hedef, "icerik": icerik, "zaman": zaman, "gorsel": gorsel})
         return redirect(url_for("mesaj_gonder"))
 
-    return render_template_string("""<h2>Mesaj Gönder</h2>
-    <form method='POST' enctype='multipart/form-data'>
-      <label>Hedef Kullanıcı ('*' = Tüm Kullanıcılar)</label><br>
-      <input name='hedef' required><br>
-      <label>Mesaj İçeriği</label><br>
-      <textarea name='icerik' required></textarea><br>
-      <label>Görsel Ekle:</label><input type='file' name='gorsel'><br>
-      <button type='submit'>Gönder</button>
-    </form>
-    <a href='/mesaj-kontrol' target='_blank'>Mesaj Takip Sayfası</a>""")
+    return render_template_string('\n    <h2>Mesaj Gönder</h2>\n    <form method=\'POST\' enctype=\'multipart/form-data\'>\n      <label>Hedef Kullanıcı ("*" = Tüm Kullanıcılar)</label><br>\n      <input name=\'hedef\' required><br>\n      <label>Mesaj İçeriği</label><br>\n      <textarea name=\'icerik\' required></textarea><br>\n      <label>Görsel Ekle:</label><input type=\'file\' name=\'gorsel\'><br>\n      <button type=\'submit\'>Gönder</button>\n    </form>\n    <a href=\'/mesaj-kontrol\' target=\'_blank\'>Mesaj Takip Sayfası</a>\n')
 
 @app.route("/mesajlar")
 def mesajlar_al():
@@ -70,24 +59,7 @@ def mesajlar_al():
 
 @app.route("/mesaj-kontrol")
 def mesaj_kontrol():
-    return render_template_string("""<script>
-      setInterval(() => {
-        fetch('/mesajlar')
-          .then(res => res.json())
-          .then(data => {
-            if (data.length > 0) {
-              let msg = data[data.length - 1];
-              let metin = 'Yeni Mesaj: ' + msg.icerik;
-              if (msg.gorsel) {
-                metin += '\nGörsel: /uploads/' + msg.gorsel;
-              }
-              alert(metin);
-              var audio = new Audio('https://www.soundjay.com/buttons/sounds/beep-07.mp3');
-              audio.play();
-            }
-          });
-      }, 10000);
-    </script>""")
+    return render_template_string('\n    <script>\n      setInterval(() => {\n        fetch(\'/mesajlar\')\n          .then(res => res.json())\n          .then(data => {\n            if (data.length > 0) {\n              let msg = data[data.length - 1];\n              let metin = "Yeni Mesaj: " + msg.icerik;\n              if (msg.gorsel) {\n                metin += "\\nGörsel: /uploads/" + msg.gorsel;\n              }\n              alert(metin);\n              var audio = new Audio("https://www.soundjay.com/buttons/sounds/beep-07.mp3");\n              audio.play();\n            }\n          });\n      }, 10000);\n    </script>\n')
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
