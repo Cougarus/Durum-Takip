@@ -1,6 +1,4 @@
-
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, session
-from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
@@ -25,14 +23,6 @@ class Kullanici(db.Model):
     unvan = db.Column(db.String(50))
     yetki = db.Column(db.Integer)
 
-class Mesaj(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    hedef = db.Column(db.String(100))
-    icerik = db.Column(db.Text)
-    dosya = db.Column(db.String(100))
-    zaman = db.Column(db.String(50))
-    gonderen = db.Column(db.String(50))
-
 class Ariza(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mahal = db.Column(db.String(50))
@@ -41,20 +31,11 @@ class Ariza(db.Model):
     zaman = db.Column(db.String(50))
     ekleyen = db.Column(db.String(50))
 
-@app.before_first_request
-def setup():
-    db.create_all()
-    if not Kullanici.query.first():
-        db.session.add(Kullanici(kullanici_adi="admin", sifre="admin123", isim="Admin", unvan="Müdür", yetki=3))
-        db.session.add(Kullanici(kullanici_adi="ahmet", sifre="ahmet123", isim="Ahmet Yılmaz", unvan="Şef", yetki=2))
-        db.session.add(Kullanici(kullanici_adi="zeynep", sifre="zeynep123", isim="Zeynep Arslan", unvan="Uzman", yetki=1))
-        db.session.commit()
-
 @app.route('/')
 def index():
     if 'kullanici' not in session:
         return redirect(url_for('login'))
-    return redirect(url_for('mesaj_gonder'))
+    return redirect(url_for('ariza_kayit'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -75,37 +56,6 @@ def logout():
     session.clear()
     flash("Çıkış yapıldı.", "success")
     return redirect(url_for('login'))
-
-@app.route('/mesaj-gonder', methods=['GET', 'POST'])
-def mesaj_gonder():
-    if 'kullanici' not in session:
-        return redirect(url_for('login'))
-    if request.method == 'POST':
-        hedef = request.form.get('hedef_kullanici')
-        icerik = request.form.get('mesaj_icerigi')
-        dosya = request.files.get('dosya')
-        zaman = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-        dosya_adi = ""
-        if dosya and dosya.filename != '':
-            dosya_adi = secure_filename(dosya.filename)
-            dosya.save(os.path.join(app.config['UPLOAD_FOLDER'], dosya_adi))
-
-        mesaj = Mesaj(hedef=hedef, icerik=icerik, dosya=dosya_adi, zaman=zaman, gonderen=session['kullanici'])
-        db.session.add(mesaj)
-        db.session.commit()
-        flash("Mesaj başarıyla gönderildi.", "success")
-        return redirect(url_for('mesaj_gonder'))
-
-    user = Kullanici.query.filter_by(kullanici_adi=session['kullanici']).first()
-    return render_template('mesaj_gonder.html', kullanici=session['kullanici'], userinfo=user)
-
-@app.route('/mesaj-takip')
-def mesaj_takip():
-    if 'kullanici' not in session:
-        return redirect(url_for('login'))
-    mesajlar = Mesaj.query.all()
-    return render_template('mesaj_takip.html', mesajlar=mesajlar)
 
 @app.route('/ariza-kayit', methods=['GET', 'POST'])
 def ariza_kayit():
