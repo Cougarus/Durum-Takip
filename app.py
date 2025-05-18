@@ -1,5 +1,4 @@
-
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta
 
@@ -26,14 +25,20 @@ def ana_sayfa():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        kullanici_adi = request.form['kullanici_adi']
-        sifre = request.form['sifre']
+        kullanici_adi = request.form.get('kullanici_adi')
+        sifre = request.form.get('sifre')
+
+        if not kullanici_adi or not sifre:
+            flash("Kullanıcı adı ve şifre zorunludur.", "warning")
+            return redirect(url_for('login'))
+
         kullanici = Kullanici.query.filter_by(kullanici_adi=kullanici_adi, sifre=sifre).first()
         if kullanici:
             session['kullanici'] = kullanici.kullanici_adi
             return redirect(url_for('ariza_kayit'))
         else:
-            return render_template("login.html", hata="Hatalı giriş.")
+            flash("Hatalı kullanıcı adı veya şifre", "danger")
+            return redirect(url_for('login'))
     return render_template("login.html")
 
 @app.route('/setup-admin')
@@ -49,6 +54,7 @@ def setup_admin():
 def ariza_kayit():
     if 'kullanici' in session:
         return render_template("ariza_kayit.html", kullanici=session['kullanici'])
+    flash("Bu sayfaya erişmek için giriş yapmalısınız.", "warning")
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
