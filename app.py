@@ -31,6 +31,13 @@ class Ariza(db.Model):
     zaman = db.Column(db.String(50))
     ekleyen = db.Column(db.String(50))
 
+@app.before_first_request
+def create_admin():
+    if not Kullanici.query.filter_by(kullanici_adi='admin').first():
+        admin = Kullanici(kullanici_adi='admin', sifre='admin', isim='Admin', unvan='Müdür', yetki=3)
+        db.session.add(admin)
+        db.session.commit()
+
 @app.route('/')
 def index():
     if 'kullanici' not in session:
@@ -62,6 +69,9 @@ def ariza_kayit():
     if 'kullanici' not in session:
         return redirect(url_for('login'))
     user = Kullanici.query.filter_by(kullanici_adi=session['kullanici']).first()
+    if not user:
+        flash("Kullanıcı bulunamadı!", "danger")
+        return redirect(url_for('logout'))
     if user.yetki < 2:
         flash("Bu sayfaya erişim yetkiniz yok!", "danger")
         return redirect(url_for('index'))
