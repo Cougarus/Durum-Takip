@@ -1,7 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="tr">
-<head><meta charset="UTF-8"><title>Giriş</title></head>
+<head><meta charset="UTF-8"><title>Giriş Yap</title></head>
 <body>
 <h2>Kullanıcı Girişi</h2>
 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -9,10 +8,10 @@
     <p style="color:{{ 'green' if category=='success' else 'red' }}">{{ message }}</p>
   {% endfor %}
 {% endwith %}
-<form method="post">
-    <input type="text" name="kullanici" placeholder="Kullanıcı Adı">
-    <input type="password" name="sifre" placeholder="Şifre">
-    <button type="submit">Giriş Yap</button>
+<form method="POST" action="/login">
+    <label>Kullanıcı:</label><input type="text" name="kullanici"><br>
+    <label>Şifre:</label><input type="password" name="sifre"><br>
+    <input type="submit" value="Giriş Yap">
 </form>
 </body>
 </html>

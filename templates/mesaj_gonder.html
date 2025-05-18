@@ -1,19 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head><meta charset="UTF-8"><title>Mesaj Gönder</title></head>
 <body>
 <h2>Mesaj Gönder</h2>
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% for category, message in messages %}
-    <p style="color:{{ 'green' if category=='success' else 'red' }}">{{ message }}</p>
-  {% endfor %}
-{% endwith %}
 <form method="post" enctype="multipart/form-data">
-    <input type="text" name="hedef_kullanici" placeholder="Hedef Kullanıcı">
-    <textarea name="mesaj_icerigi" placeholder="Mesaj İçeriği"></textarea>
-    <input type="file" name="dosya">
-    <button type="submit">Gönder</button>
+    <input type="text" name="hedef_kullanici" placeholder="Hedef Kullanıcı"><br>
+    <textarea name="icerik" placeholder="Mesaj İçeriği"></textarea><br>
+    <input type="file" name="dosya"><br>
+    <input type="submit" value="Gönder">
 </form>
-<a href="/mesaj-takip">Mesaj Takibi</a> | <a href="/ariza-kayit">Arıza Kaydı</a>
-</body></html>
+<a href="/mesaj-takip">Mesajları Gör</a>
+</body>
+</html>

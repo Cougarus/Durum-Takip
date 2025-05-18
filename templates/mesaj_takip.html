@@ -1,18 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="tr">
-<head><meta charset="UTF-8"><title>Mesaj Takibi</title></head>
+<head><meta charset="UTF-8"><title>Mesaj Takip</title></head>
 <body>
-<h2>Mesaj Listesi</h2>
+<h2>Gönderilen Mesajlar</h2>
 <ul>
 {% for mesaj in mesajlar %}
-    <li>
-        <b>Hedef:</b> {{ mesaj.hedef }}<br>
-        <b>İçerik:</b> {{ mesaj.icerik }}<br>
-        <b>Zaman:</b> {{ mesaj.zaman }}<br>
-        {% if mesaj.dosya %}<b>Dosya:</b> <a href="/uploads/{{ mesaj.dosya }}">{{ mesaj.dosya }}</a>{% endif %}
-    </li>
+  <li><strong>{{ mesaj.hedef }}</strong> - {{ mesaj.icerik }} - {{ mesaj.zaman }}</li>
 {% endfor %}
 </ul>
 <a href="/mesaj-gonder">← Geri</a>
-</body></html>
+</body>
+</html>
