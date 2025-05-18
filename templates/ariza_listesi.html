@@ -1,0 +1,24 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head><meta charset="UTF-8"><title>Arıza Listesi</title></head>
+<body>
+<h2>Arıza Kayıtları</h2>
+<table border="1">
+    <tr><th>Mahal</th><th>Tanım</th><th>Durum</th><th>Zaman</th></tr>
+    {% for ariza in arizalar %}
+    <tr style="background-color:
+        {% if ariza.durum == 'Açık' %}#f99
+        {% elif ariza.durum == 'Kapalı' %}#9f9
+        {% elif ariza.durum == 'Askıda' %}#ff9
+        {% endif %};"
+    >
+        <td>{{ ariza.mahal }}</td>
+        <td>{{ ariza.tanim }}</td>
+        <td>{{ ariza.durum }}</td>
+        <td>{{ ariza.zaman }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<a href="/ariza-kayit">← Geri</a>
+</body></html>
