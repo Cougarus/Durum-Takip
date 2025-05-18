@@ -1,6 +1,7 @@
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 app = Flask(__name__)
 app.secret_key = "gizli_anahtar"
@@ -17,6 +18,14 @@ class Kullanici(db.Model):
     isim = db.Column(db.String(50))
     unvan = db.Column(db.String(50))
     yetki = db.Column(db.Integer)
+
+class Ariza(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    mahal = db.Column(db.String(100))
+    tanim = db.Column(db.Text)
+    durum = db.Column(db.String(20))
+    zaman = db.Column(db.String(50))
+    ekleyen = db.Column(db.String(50))
 
 @app.route('/')
 def ana_sayfa():
@@ -50,12 +59,26 @@ def setup_admin():
         return "Admin oluşturuldu."
     return "Zaten admin var."
 
-@app.route('/ariza-kayit')
+@app.route('/ariza-kayit', methods=['GET', 'POST'])
 def ariza_kayit():
-    if 'kullanici' in session:
-        return render_template("ariza_kayit.html", kullanici=session['kullanici'])
-    flash("Bu sayfaya erişmek için giriş yapmalısınız.", "warning")
-    return redirect(url_for('login'))
+    if 'kullanici' not in session:
+        flash("Bu sayfaya erişmek için giriş yapmalısınız.", "warning")
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        mahal = request.form.get('mahal_kodu')
+        tanim = request.form.get('ariza_tanimi')
+        durum = request.form.get('durum')
+        zaman = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        ekleyen = session['kullanici']
+
+        ariza = Ariza(mahal=mahal, tanim=tanim, durum=durum, zaman=zaman, ekleyen=ekleyen)
+        db.session.add(ariza)
+        db.session.commit()
+        flash("Arıza kaydı başarıyla eklendi.", "success")
+        return redirect(url_for('ariza_kayit'))
+
+    return render_template("ariza_kayit.html", kullanici=session['kullanici'])
 
 if __name__ == '__main__':
     with app.app_context():
